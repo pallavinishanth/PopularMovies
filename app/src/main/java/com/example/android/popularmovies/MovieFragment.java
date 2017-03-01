@@ -2,9 +2,11 @@ package com.example.android.popularmovies;
 
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -38,7 +40,10 @@ public class MovieFragment extends Fragment {
     private RecyclerView.LayoutManager mLayoutManager;
     private MovieDataAdapter movieAdapter;
 
+    ArrayList<MovieData> MOarray;
     ArrayList<MovieData> Movieobjectarray = new ArrayList<MovieData>();
+
+    String MOVIE_KEY = "Movie";
 
 
     private final String LOG_TAG = MovieFragment.class.getSimpleName();
@@ -53,8 +58,23 @@ public class MovieFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
+//        if(savedInstanceState!=null){
+//            MOarray = savedInstanceState.getParcelableArrayList(MOVIE_KEY);
+//            mRecyclerView.setAdapter(movieAdapter);
+//        } else{
+//
+//            MOarray = new ArrayList<MovieData>();
+//            MovieDBTask moviedbTask = new MovieDBTask();
+//            moviedbTask.execute("popular");
+//        }
+
     }
 
+//    @Override
+//    public void onSaveInstanceState(Bundle outState) {
+//        super.onSaveInstanceState(outState);
+//        outState.putParcelableArrayList(MOVIE_KEY, MOarray);
+//    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -77,32 +97,30 @@ public class MovieFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
-//    @Override
-//    public void onStart(){
-//
-//        super.onStart();
-//        MovieDBTask moviedbTask = new MovieDBTask();
-//        //moviedbTask.execute("popular");
-//        SharedPreferences sharedPrefs =
-//                PreferenceManager.getDefaultSharedPreferences(getActivity());
-//
-//        String sortorder = sharedPrefs.getString(getString(R.string.pref_sort_order_key),
-//                getString(R.string.pref_sort_order_mostpopular));
-//
-//        moviedbTask.execute(sortorder);
-//
-//        if(sortorder.equals(getString(R.string.pref_sort_order_mostpopular))) {
-//
-//            moviedbTask.execute(sortorder);
-//        }else if(sortorder.equals(getString(R.string.pref_sort_order_highestrated))){
-//
-//            moviedbTask.execute(sortorder);
-//        }else {
-//
-//            Log.d(LOG_TAG, "Sort Order Not Found: " + sortorder);
-//        }
-//
-//    }
+    @Override
+    public void onStart(){
+
+        super.onStart();
+        MovieDBTask moviedbTask = new MovieDBTask();
+
+        SharedPreferences sharedPrefs =
+                PreferenceManager.getDefaultSharedPreferences(getActivity());
+
+        String sortorder = sharedPrefs.getString(getString(R.string.pref_sort_order_key),
+                getString(R.string.pref_sort_order_default));
+
+        if(sortorder.equals(getString(R.string.pref_sort_order_mostpopular))) {
+
+            moviedbTask.execute(sortorder);
+        }else if(sortorder.equals(getString(R.string.pref_sort_order_highestrated))){
+
+            moviedbTask.execute(sortorder);
+        }else {
+
+            Log.d(LOG_TAG, "Sort Order Not Found: " + sortorder);
+        }
+
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -117,12 +135,11 @@ public class MovieFragment extends Fragment {
         mLayoutManager = new GridLayoutManager(getActivity(), 2, GridLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
+//        MovieDBTask moviedbTask = new MovieDBTask();
+//        moviedbTask.execute("top_rated");
+
         movieAdapter = new MovieDataAdapter(getActivity(), Movieobjectarray);
         mRecyclerView.setAdapter(movieAdapter);
-
-        MovieDBTask moviedbTask = new MovieDBTask();
-        moviedbTask.execute("popular");
-
 
         movieAdapter.setOnItemClickListener(new MovieDataAdapter.OnItemClickListener(){
 
@@ -134,7 +151,7 @@ public class MovieFragment extends Fragment {
                 MovieData md = Movieobjectarray.get(position);
 
                 Intent i = new Intent(getActivity(), DetailActivity.class);
-                i.putExtra("Movie", md);
+                i.putExtra(MOVIE_KEY, md);
                 startActivity(i);
 
 //                Intent intent = new Intent(getActivity(), MovieDetailActivity.class)
@@ -168,6 +185,8 @@ public class MovieFragment extends Fragment {
         private final String LOG_TAG = MovieDBTask.class.getSimpleName();
 
         private ArrayList<MovieData> getMovieDataFromJSON(String moviedataStr) throws JSONException {
+
+
 
             final String RESULTS = "results";
             final String POSTER_PATH = "poster_path";
@@ -291,16 +310,12 @@ public class MovieFragment extends Fragment {
         @Override
         protected void onPostExecute(ArrayList<MovieData> movieDatas) {
 
-             if(movieDatas!=null){
-                 movieAdapter.notifyDataSetChanged();
-                 mRecyclerView.setVisibility(View.VISIBLE);
-
-            }
+            super.onPostExecute(movieDatas);
+            movieAdapter.notifyDataSetChanged();
+            mRecyclerView.setAdapter(movieAdapter);
 
         }
     }
-
-
 
 }
 
