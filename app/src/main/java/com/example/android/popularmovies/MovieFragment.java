@@ -1,8 +1,11 @@
 package com.example.android.popularmovies;
 
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -17,6 +20,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -70,6 +74,18 @@ public class MovieFragment extends Fragment {
 
     }
 
+    public boolean isOnline(){
+
+        ConnectivityManager conn_m =
+                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo netInfo = conn_m.getActiveNetworkInfo();
+
+        return ((netInfo !=null) && (netInfo.isConnected()));
+    }
+
+
+
 //    @Override
 //    public void onSaveInstanceState(Bundle outState) {
 //        super.onSaveInstanceState(outState);
@@ -101,23 +117,30 @@ public class MovieFragment extends Fragment {
     public void onStart(){
 
         super.onStart();
-        MovieDBTask moviedbTask = new MovieDBTask();
 
-        SharedPreferences sharedPrefs =
-                PreferenceManager.getDefaultSharedPreferences(getActivity());
+        if(isOnline()) {
 
-        String sortorder = sharedPrefs.getString(getString(R.string.pref_sort_order_key),
-                getString(R.string.pref_sort_order_default));
+            MovieDBTask moviedbTask = new MovieDBTask();
 
-        if(sortorder.equals(getString(R.string.pref_sort_order_mostpopular))) {
+            SharedPreferences sharedPrefs =
+                    PreferenceManager.getDefaultSharedPreferences(getActivity());
 
-            moviedbTask.execute(sortorder);
-        }else if(sortorder.equals(getString(R.string.pref_sort_order_highestrated))){
+            String sortorder = sharedPrefs.getString(getString(R.string.pref_sort_order_key),
+                    getString(R.string.pref_sort_order_default));
 
-            moviedbTask.execute(sortorder);
-        }else {
+            if (sortorder.equals(getString(R.string.pref_sort_order_mostpopular))) {
 
-            Log.d(LOG_TAG, "Sort Order Not Found: " + sortorder);
+                moviedbTask.execute(sortorder);
+            } else if (sortorder.equals(getString(R.string.pref_sort_order_highestrated))) {
+
+                moviedbTask.execute(sortorder);
+            } else {
+
+                Log.d(LOG_TAG, "Sort Order Not Found: " + sortorder);
+            }
+        } else {
+
+            Toast.makeText(getActivity(), " Not Connected to Network", Toast.LENGTH_LONG).show();
         }
 
     }
