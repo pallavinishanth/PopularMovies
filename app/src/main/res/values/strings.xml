@@ -1,33 +1,24 @@
 <resources>
     <string name="app_name">PopularMovies</string>
-    <string name="action_most_popular"> Most Popular</string>
-    <string name="action_highest_rated"> Highest Rated</string>
 
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="movie_detail_activity">MovieDetail</string>
-    <string name="hello_world">Hello World..</string>
     <string name="title_activity_settings">Settings</string>
 
     <!-- Strings related to Settings -->
 
-    <!-- Label for the temperature units preference [CHAR LIMIT=30] -->
     <string name="pref_sort_order_label">Sort Order</string>
 
-    <!-- Label for metric option in temperature unit preference [CHAR LIMIT=25] -->
     <string name="pref_sort_order_label_mostpopular">Most Popular</string>
 
-    <!-- Label for imperial option in temperature unit preference [CHAR LIMIT=25] -->
     <string name="pref_sort_order_label_highestrated">Highest Rated</string>
 
-    <!-- Key name for temperature unit preference in SharedPreferences [CHAR LIMIT=NONE] -->
     <string name="pref_sort_order_key" translatable="false">Order</string>
 
-    <!-- Value in SharedPreferences for metric temperature unit option [CHAR LIMIT=NONE] -->
     <string name="pref_sort_order_mostpopular" translatable="false">popular</string>
 
-    <!-- Value in SharedPreferences for imperial temperature unit option [CHAR LIMIT=NONE] -->
     <string name="pref_sort_order_highestrated" translatable="false">top_rated</string>
 
-    <!-- Strings related to Detail Activity -->
+    <string name="pref_sort_order_default" translatable="false">popular</string>
+
 </resources>
