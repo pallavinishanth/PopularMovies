@@ -26,21 +26,6 @@ public class MovieDataAdapter extends RecyclerView.Adapter<MovieDataAdapter.View
     private final String LOG_TAG = MovieDataAdapter.class.getSimpleName();
 
 
-    private String[] mURL = {"http://image.tmdb.org/t/p/w185//nBNZadXqJSdt05SHLqgT0HuC5Gm.jpg",
-            "http://image.tmdb.org/t/p/w185//nBNZadXqJSdt05SHLqgT0HuC5Gm.jpg",
-            "http://image.tmdb.org/t/p/w185//nBNZadXqJSdt05SHLqgT0HuC5Gm.jpg",
-            "http://image.tmdb.org/t/p/w185//nBNZadXqJSdt05SHLqgT0HuC5Gm.jpg",
-            "http://image.tmdb.org/t/p/w185//nBNZadXqJSdt05SHLqgT0HuC5Gm.jpg",
-            "http://image.tmdb.org/t/p/w185//nBNZadXqJSdt05SHLqgT0HuC5Gm.jpg",
-            "http://image.tmdb.org/t/p/w185//nBNZadXqJSdt05SHLqgT0HuC5Gm.jpg",
-            "http://image.tmdb.org/t/p/w185//nBNZadXqJSdt05SHLqgT0HuC5Gm.jpg",
-            "http://image.tmdb.org/t/p/w185//nBNZadXqJSdt05SHLqgT0HuC5Gm.jpg",
-            "http://image.tmdb.org/t/p/w185//nBNZadXqJSdt05SHLqgT0HuC5Gm.jpg",
-            "http://image.tmdb.org/t/p/w185//nBNZadXqJSdt05SHLqgT0HuC5Gm.jpg",
-            "http://image.tmdb.org/t/p/w185//nBNZadXqJSdt05SHLqgT0HuC5Gm.jpg",
-            "http://image.tmdb.org/t/p/w185//nBNZadXqJSdt05SHLqgT0HuC5Gm.jpg",
-            "http://image.tmdb.org/t/p/w185//nBNZadXqJSdt05SHLqgT0HuC5Gm.jpg"};
-
     public interface OnItemClickListener {
         void onItemClick(View itemView, int position);
     }
@@ -65,10 +50,7 @@ public class MovieDataAdapter extends RecyclerView.Adapter<MovieDataAdapter.View
         // create a new view
         View mview = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.grid_item_movie, parent, false);
-        // set the view's size, margins, paddings and layout parameters
-        //imageView.setLayoutParams(new GridView.LayoutParams(800, 800));
-        //imageView.setPadding(1, 1, 1, 1);
-        //ViewHolder vh = new ViewHolder(imageView);
+
         return new ViewHolder(mview);
     }
 
@@ -78,10 +60,8 @@ public class MovieDataAdapter extends RecyclerView.Adapter<MovieDataAdapter.View
 
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
-        //holder.mImageView.setImageBitmap(mData[position]);
-        //Log.v(LOG_TAG, "poster path in adapter" + mData.get(position).getPosterPath());
-         Picasso.with(mContext).load(baseURL+ mData.get(position).getPosterPath()).into(holder.mImageView);
-        //Picasso.with(mContext).load(mURL[position]).into(holder.mImageView);
+         Picasso.with(mContext)
+                 .load(baseURL+ mData.get(position).getPosterPath()).into(holder.mImageView);
 
     }
 
@@ -90,17 +70,6 @@ public class MovieDataAdapter extends RecyclerView.Adapter<MovieDataAdapter.View
     public int getItemCount() {
 
         return mData.size();
-        //return mURL.length;
-    }
-
-    public void updatemoviedata(ArrayList<MovieData> moviedata){
-
-        for(int i=0; i<moviedata.size(); i++){
-
-            mData.add(i, moviedata.get(i));
-        }
-
-        notifyDataSetChanged();
 
     }
 

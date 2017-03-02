@@ -44,7 +44,7 @@ public class MovieFragment extends Fragment {
     private RecyclerView.LayoutManager mLayoutManager;
     private MovieDataAdapter movieAdapter;
 
-    ArrayList<MovieData> MOarray;
+    ArrayList<MovieData> MOarray = new ArrayList<MovieData>();
     ArrayList<MovieData> Movieobjectarray = new ArrayList<MovieData>();
 
     String MOVIE_KEY = "Movie";
@@ -62,15 +62,9 @@ public class MovieFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
-//        if(savedInstanceState!=null){
-//            MOarray = savedInstanceState.getParcelableArrayList(MOVIE_KEY);
-//            mRecyclerView.setAdapter(movieAdapter);
-//        } else{
-//
-//            MOarray = new ArrayList<MovieData>();
-//            MovieDBTask moviedbTask = new MovieDBTask();
-//            moviedbTask.execute("popular");
-//        }
+        if(savedInstanceState!=null){
+            Movieobjectarray = savedInstanceState.getParcelableArrayList(MOVIE_KEY);
+        }
 
     }
 
@@ -86,11 +80,11 @@ public class MovieFragment extends Fragment {
 
 
 
-//    @Override
-//    public void onSaveInstanceState(Bundle outState) {
-//        super.onSaveInstanceState(outState);
-//        outState.putParcelableArrayList(MOVIE_KEY, MOarray);
-//    }
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putParcelableArrayList(MOVIE_KEY, MOarray);
+        super.onSaveInstanceState(outState);
+    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -158,9 +152,6 @@ public class MovieFragment extends Fragment {
         mLayoutManager = new GridLayoutManager(getActivity(), 2, GridLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-//        MovieDBTask moviedbTask = new MovieDBTask();
-//        moviedbTask.execute("top_rated");
-
         movieAdapter = new MovieDataAdapter(getActivity(), Movieobjectarray);
         mRecyclerView.setAdapter(movieAdapter);
 
@@ -177,28 +168,8 @@ public class MovieFragment extends Fragment {
                 i.putExtra(MOVIE_KEY, md);
                 startActivity(i);
 
-//                Intent intent = new Intent(getActivity(), MovieDetailActivity.class)
-//                        .putExtra(Intent.EXTRA_TEXT, forecast );
-//
-//                startActivity(intent);
             }
         });
-
-//        GridView gridview = (GridView) rootView.findViewById(R.id.gridview_movie);
-//        //gridview.setAdapter(new MovieDataAdapter(getActivity()));
-//
-//        gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-//
-//                String forecast = "Hello";
-//
-//                Intent intent = new Intent(getActivity(), MovieDetailActivity.class)
-//                        .putExtra(Intent.EXTRA_TEXT, forecast );
-//
-//                startActivity(intent);
-//            }
-//        });
 
         return rootView;
     }
@@ -208,8 +179,6 @@ public class MovieFragment extends Fragment {
         private final String LOG_TAG = MovieDBTask.class.getSimpleName();
 
         private ArrayList<MovieData> getMovieDataFromJSON(String moviedataStr) throws JSONException {
-
-
 
             final String RESULTS = "results";
             final String POSTER_PATH = "poster_path";
@@ -339,6 +308,4 @@ public class MovieFragment extends Fragment {
 
         }
     }
-
 }
-
