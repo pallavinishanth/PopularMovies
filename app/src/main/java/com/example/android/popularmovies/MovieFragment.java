@@ -20,7 +20,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -45,9 +44,11 @@ public class MovieFragment extends Fragment {
     private MovieDataAdapter movieAdapter;
 
     ArrayList<MovieData> MOarray = new ArrayList<MovieData>();
-    ArrayList<MovieData> Movieobjectarray = new ArrayList<MovieData>();
+    public static ArrayList<MovieData> Movieobjectarray = new ArrayList<MovieData>();
 
     String MOVIE_KEY = "Movie";
+
+    static String SOrder = null;
 
 
     private final String LOG_TAG = MovieFragment.class.getSimpleName();
@@ -61,6 +62,8 @@ public class MovieFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
+        Log.v(LOG_TAG, "on create.. ");
 
         if(savedInstanceState!=null){
             Movieobjectarray = savedInstanceState.getParcelableArrayList(MOVIE_KEY);
@@ -112,36 +115,37 @@ public class MovieFragment extends Fragment {
 
         super.onStart();
 
-        if(isOnline()) {
+        SharedPreferences.OnSharedPreferenceChangeListener prefListener;
 
-            MovieDBTask moviedbTask = new MovieDBTask();
+        SharedPreferences sharedPrefs =
+                PreferenceManager.getDefaultSharedPreferences(getActivity());
 
-            SharedPreferences sharedPrefs =
-                    PreferenceManager.getDefaultSharedPreferences(getActivity());
 
-            String sortorder = sharedPrefs.getString(getString(R.string.pref_sort_order_key),
+        String sortorder = sharedPrefs.getString(getString(R.string.pref_sort_order_key),
                     getString(R.string.pref_sort_order_default));
 
-            if (sortorder.equals(getString(R.string.pref_sort_order_mostpopular))) {
+        if(isOnline() && (Movieobjectarray.isEmpty()) || (SOrder!=sortorder)){
 
-                moviedbTask.execute(sortorder);
-            } else if (sortorder.equals(getString(R.string.pref_sort_order_highestrated))) {
+            Log.v(LOG_TAG, "on start.. Object Array is empty");
 
-                moviedbTask.execute(sortorder);
-            } else {
-
-                Log.d(LOG_TAG, "Sort Order Not Found: " + sortorder);
-            }
-        } else {
-
-            Toast.makeText(getActivity(), " Not Connected to Network", Toast.LENGTH_LONG).show();
+            getmoviedata(sortorder);
+            SOrder = sortorder;
         }
 
     }
 
+    public void getmoviedata(String sort_order){
+
+        MovieDBTask moviedbTask = new MovieDBTask();
+        moviedbTask.execute(sort_order);
+    }
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        Log.v(LOG_TAG, "on create view.. ");
 
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_movie, container, false);
@@ -216,7 +220,7 @@ public class MovieFragment extends Fragment {
 
                 Movieobjectarray.add(i, moviedataobject);
 
-                Log.v(LOG_TAG, "PosterPath " + moviedataobject.getPosterPath());
+                //Log.v(LOG_TAG, "PosterPath " + moviedataobject.getPosterPath());
             }
 
             return Movieobjectarray;

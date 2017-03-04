@@ -5,11 +5,13 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.support.design.widget.CollapsingToolbarLayout;
 
 import com.squareup.picasso.Picasso;
 
@@ -56,8 +58,15 @@ public class DetailActivity extends AppCompatActivity {
                 String title = mdata.getoriginalTitle();
 
                 if(!title.isEmpty()){
-                    TextView tv = (TextView) rootView.findViewById(R.id.movie_detail_title);
-                    tv.setText(title);
+//                    TextView tv = (TextView) rootView.findViewById(R.id.movie_detail_title);
+//                    tv.setText(title);
+                    CollapsingToolbarLayout collapsingToolbar =
+                            (CollapsingToolbarLayout) rootView.findViewById(R.id.collapsing_toolbar);
+                    collapsingToolbar.setTitle(title);
+                    collapsingToolbar.setExpandedTitleGravity(Gravity.CENTER_HORIZONTAL);
+                    collapsingToolbar.setCollapsedTitleTextAppearance(R.style.CollapsedAppBar);
+                    collapsingToolbar.setExpandedTitleTextAppearance(R.style.ExpandedAppBar);
+
 
                 } else {
                     title = "Movie Title not found";
