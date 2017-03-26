@@ -4,6 +4,7 @@ package com.example.android.popularmovies;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -20,6 +21,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
+
+import com.example.android.popularmovies.Network.MovieData;
+import com.example.android.popularmovies.Network.MovieDataJSON;
+import com.example.android.popularmovies.Network.MovieRetrofitAPI;
+import com.example.android.popularmovies.data.MovieContract;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,18 +40,33 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
+import retrofit.Call;
+import retrofit.Callback;
+import retrofit.GsonConverterFactory;
+import retrofit.Response;
+import retrofit.Retrofit;
+
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class MovieFragment extends Fragment {
 
+    final String MOVIEDB_API = "http://api.themoviedb.org/3/movie/";
+
     private RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
     private MovieDataAdapter movieAdapter;
+    private MovieDataAdapter FavmovieAdapter;
+    private Retrofit movieRetrofit = new Retrofit.Builder().baseUrl(MOVIEDB_API).
+            addConverterFactory(GsonConverterFactory.create()).build();
+    MovieRetrofitAPI retrofitAPI = movieRetrofit.create(MovieRetrofitAPI.class);
 
+    MovieDataJSON moviedataJson = new MovieDataJSON();
+    ArrayList<MovieData> moviedata = new ArrayList<>();
     ArrayList<MovieData> MOarray = new ArrayList<MovieData>();
     public static ArrayList<MovieData> Movieobjectarray = new ArrayList<MovieData>();
+    public static ArrayList<MovieData> FavMovieobjectarray = new ArrayList<MovieData>();
 
     String MOVIE_KEY = "Movie";
 
@@ -124,7 +146,37 @@ public class MovieFragment extends Fragment {
         String sortorder = sharedPrefs.getString(getString(R.string.pref_sort_order_key),
                     getString(R.string.pref_sort_order_default));
 
-        if(isOnline() && (Movieobjectarray.isEmpty()) || (SOrder!=sortorder)){
+        if(FavMovieobjectarray.isEmpty()){
+            getFavMovies();
+
+        }
+
+        if(sortorder.equals(getString(R.string.pref_sort_order_favorites))){
+
+            Log.v(LOG_TAG, "Sort Order is Favorites");
+
+            FavmovieAdapter = new MovieDataAdapter(getActivity(), FavMovieobjectarray);
+            mRecyclerView.setAdapter(FavmovieAdapter);
+
+            FavmovieAdapter.setOnItemClickListener(new MovieDataAdapter.OnItemClickListener(){
+
+                @Override
+                public void onItemClick(View itemView, int position) {
+                    //Toast.makeText(getActivity(), "Item clicked", Toast.LENGTH_SHORT).show();
+                    String forecast = "Hello Favorite detail Activity";
+
+                    MovieData md = FavMovieobjectarray.get(position);
+
+                    Intent i = new Intent(getActivity(), DetailActivity.class);
+                    i.putExtra(MOVIE_KEY, md);
+                    startActivity(i);
+
+                }
+            });
+
+        }else if(isOnline() && (Movieobjectarray.isEmpty())
+                && (!sortorder.equals(getString(R.string.pref_sort_order_favorites)))
+                || (!SOrder.equals(sortorder))){
 
             Log.v(LOG_TAG, "on start.. Object Array is empty");
 
@@ -136,8 +188,83 @@ public class MovieFragment extends Fragment {
 
     public void getmoviedata(String sort_order){
 
-        MovieDBTask moviedbTask = new MovieDBTask();
-        moviedbTask.execute(sort_order);
+//        MovieDBTask moviedbTask = new MovieDBTask();
+//        moviedbTask.execute(sort_order);
+
+        Log.v(LOG_TAG, "Get Movies List" + sort_order);
+
+        Call<MovieDataJSON> moviedatacall = retrofitAPI.MOVIE_DATA_CALL(sort_order,
+                BuildConfig.MOVIEDB_API_KEY);
+
+        moviedatacall.enqueue(new Callback<MovieDataJSON>() {
+            @Override
+            public void onResponse(Response<MovieDataJSON> response, Retrofit retrofit) {
+
+                Log.v(LOG_TAG, "Response is " + response.isSuccess());
+
+                moviedata = response.body().getMovieresults();
+
+//                for(MovieData mdata : moviedata){
+//
+//                    Log.v(LOG_TAG, "Movie title" + mdata.getoriginalTitle());
+//                }
+                movieAdapter = new MovieDataAdapter(getActivity(), moviedata);
+                mRecyclerView.setAdapter(movieAdapter);
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+
+                Log.v(LOG_TAG, "On Failure" + t.toString());
+            }
+
+        });
+    }
+
+    public void getFavMovies(){
+
+        Log.v(LOG_TAG, "Get favorite Movies");
+
+        Cursor favmoviecursor;
+
+        favmoviecursor = getActivity().getContentResolver().
+                query(MovieContract.MovieEntry.CONTENT_URI, null, null, null, null, null);
+
+        if(favmoviecursor.getCount()!=0){
+
+            Log.v(LOG_TAG, "Fav movies DB has items" + favmoviecursor.getCount());
+
+            favmoviecursor.moveToFirst();
+            int i=0;
+
+            do{
+
+                MovieData favMovieDataObject = new MovieData();
+
+                favMovieDataObject.setPosterPath(favmoviecursor.
+                        getString(favmoviecursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_POSTERPATH)));
+                favMovieDataObject.setoverview(favmoviecursor.
+                        getString(favmoviecursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_SYNOPSIS)));
+                favMovieDataObject.setreleaseDate(favmoviecursor.
+                        getString(favmoviecursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_RELEASEDATE)));
+                favMovieDataObject.setoriginalTitle(favmoviecursor.
+                        getString(favmoviecursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_TITLE)));
+                favMovieDataObject.setvoteAverage(favmoviecursor.
+                        getDouble(favmoviecursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_VOTEAVERAGE)));
+                favMovieDataObject.setMovieID(favmoviecursor.
+                        getLong(favmoviecursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_SYNOPSIS)));
+
+                FavMovieobjectarray.add(i, favMovieDataObject);
+                i++;
+
+            }while(favmoviecursor.moveToNext());
+            favmoviecursor.close();
+        }else{
+
+            Toast.makeText(getActivity(), "No Movies in Favorite List", Toast.LENGTH_SHORT).show();
+            favmoviecursor.close();
+        }
+
     }
 
 
@@ -156,7 +283,7 @@ public class MovieFragment extends Fragment {
         mLayoutManager = new GridLayoutManager(getActivity(), 2, GridLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        movieAdapter = new MovieDataAdapter(getActivity(), Movieobjectarray);
+        movieAdapter = new MovieDataAdapter(getActivity(), moviedata);
         mRecyclerView.setAdapter(movieAdapter);
 
         movieAdapter.setOnItemClickListener(new MovieDataAdapter.OnItemClickListener(){
@@ -166,7 +293,7 @@ public class MovieFragment extends Fragment {
                 //Toast.makeText(getActivity(), "Item clicked", Toast.LENGTH_SHORT).show();
                 String forecast = "Hello detail Activity";
 
-                MovieData md = Movieobjectarray.get(position);
+                MovieData md = moviedata.get(position);
 
                 Intent i = new Intent(getActivity(), DetailActivity.class);
                 i.putExtra(MOVIE_KEY, md);
@@ -216,7 +343,7 @@ public class MovieFragment extends Fragment {
                         setoriginalTitle(moviedataArray.getJSONObject(i).getString(ORIGINAL_TITLE));
 
                 moviedataobject.
-                        setvoteAverage(moviedataArray.getJSONObject(i).getString(VOTE_AVERAGE));
+                        setvoteAverage(moviedataArray.getJSONObject(i).getDouble(VOTE_AVERAGE));
 
                 Movieobjectarray.add(i, moviedataobject);
 

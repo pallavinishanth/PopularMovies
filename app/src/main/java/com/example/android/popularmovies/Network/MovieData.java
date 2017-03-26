@@ -1,4 +1,4 @@
-package com.example.android.popularmovies;
+package com.example.android.popularmovies.Network;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -9,52 +9,52 @@ import android.os.Parcelable;
 
 public class MovieData implements Parcelable {
 
-    String posterPath;
+    String poster_path;
     String overview;
-    String releaseDate;
+    String release_date;
     Long id;
-    String originalTitle;
-    String vote_Average;
+    String original_title;
+    double vote_average;
 
     public MovieData(){
 
     }
 
     // Setter Methods
-    public void setPosterPath(String pp){
+    public void setPosterPath(String poster_path){
 
-        posterPath = pp;
+        this.poster_path = poster_path;
     }
 
-    public void setoverview(String ov){
+    public void setoverview(String overview){
 
-        overview = ov;
+        this.overview = overview;
     }
 
-    public void setreleaseDate(String rd){
+    public void setreleaseDate(String release_date){
 
-        releaseDate = rd;
+        this.release_date = release_date;
     }
 
-    public void setoriginalTitle(String ot){
+    public void setoriginalTitle(String original_title){
 
-        originalTitle = ot;
+        this.original_title = original_title;
     }
 
-    public void setvoteAverage(String va){
+    public void setvoteAverage(double vote_average){
 
-        vote_Average = va;
+        this.vote_average = vote_average;
     }
 
-    public void setMovieID(Long ID){
+    public void setMovieID(Long id){
 
-        id = ID;
+        this.id = id;
     }
 
     // Getter Methods
     public String getPosterPath(){
 
-        return posterPath;
+        return poster_path;
     }
 
     public String getoverview(){
@@ -64,17 +64,17 @@ public class MovieData implements Parcelable {
 
     public String getreleaseDate(){
 
-        return releaseDate;
+        return release_date;
     }
 
     public String getoriginalTitle(){
 
-        return originalTitle;
+        return original_title;
     }
 
-    public String getvoteAverage(){
+    public double getvoteAverage(){
 
-        return vote_Average;
+        return vote_average;
     }
 
     public Long getMovieID(){
@@ -84,11 +84,11 @@ public class MovieData implements Parcelable {
 
     private MovieData(Parcel in){
 
-        posterPath = in.readString();
+        poster_path = in.readString();
         overview = in.readString();
-        releaseDate = in.readString();
-        originalTitle = in.readString();
-        vote_Average = in.readString();
+        release_date = in.readString();
+        original_title = in.readString();
+        vote_average = in.readDouble();
         id = in.readLong();
 
     }
@@ -101,11 +101,11 @@ public class MovieData implements Parcelable {
     @Override
     public void writeToParcel(Parcel parcel, int i) {
 
-        parcel.writeString(posterPath);
+        parcel.writeString(poster_path);
         parcel.writeString(overview);
-        parcel.writeString(releaseDate);
-        parcel.writeString(originalTitle);
-        parcel.writeString(vote_Average);
+        parcel.writeString(release_date);
+        parcel.writeString(original_title);
+        parcel.writeDouble(vote_average);
         parcel.writeLong(id);
 
     }
@@ -122,4 +122,5 @@ public class MovieData implements Parcelable {
             return new MovieData[i];
         }
     };
+
 }
