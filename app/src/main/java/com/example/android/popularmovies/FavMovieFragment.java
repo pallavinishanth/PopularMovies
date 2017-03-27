@@ -26,13 +26,11 @@ public class FavMovieFragment extends Fragment {
 
     private RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
-    private MovieDataAdapter movieAdapter;
-    private MovieDataAdapter FavmovieAdapter;
+    private FavMovieAdapter movieAdapter;
 
-    public static ArrayList<MovieData> FavMovieobjectarray = new ArrayList<MovieData>();
+    public static ArrayList<MovieData> FavMoviedata = new ArrayList<MovieData>();
 
     private final String LOG_TAG = FavMovieFragment.class.getSimpleName();
-    ArrayList<MovieData> saved_FMData = new ArrayList<MovieData>();
 
     String MOVIE_KEY = "FavMovie";
 
@@ -44,14 +42,14 @@ public class FavMovieFragment extends Fragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        outState.putParcelableArrayList("P_Movies", saved_FMData);
+        outState.putParcelableArrayList("P_Movies", FavMoviedata);
     }
 
     @Override
     public void onStart() {
         super.onStart();
 
-        if(FavMovieobjectarray.isEmpty()){
+        if(FavMoviedata.isEmpty()){
             getFavMovies();
 
         }
@@ -78,7 +76,7 @@ public class FavMovieFragment extends Fragment {
         if(savedInstanceState!=null){
 
             Log.v(LOG_TAG, "Saved Instance Not null.. ");
-            FavMovieobjectarray = savedInstanceState.getParcelableArrayList("P_Movies");
+            FavMoviedata = savedInstanceState.getParcelableArrayList("P_Movies");
         }
 
         // Inflate the layout for this fragment
@@ -90,16 +88,16 @@ public class FavMovieFragment extends Fragment {
         mLayoutManager = new GridLayoutManager(getActivity(), 2, GridLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        movieAdapter = new MovieDataAdapter(getActivity(), FavMovieobjectarray);
+        movieAdapter = new FavMovieAdapter(getActivity(), FavMoviedata);
         mRecyclerView.setAdapter(movieAdapter);
 
-        movieAdapter.setOnItemClickListener(new MovieDataAdapter.OnItemClickListener(){
+        movieAdapter.setOnItemClickListener(new FavMovieAdapter.OnItemClickListener(){
 
             @Override
             public void onItemClick(View itemView, int position) {
                 Toast.makeText(getActivity(), "Fav Movie clicked", Toast.LENGTH_SHORT).show();
 
-                MovieData md = FavMovieobjectarray.get(position);
+                MovieData md = FavMoviedata.get(position);
 
                 Intent i = new Intent(getActivity(), DetailActivity.class);
                 //i.putExtra(MOVIE_KEY, md);
@@ -144,32 +142,20 @@ public class FavMovieFragment extends Fragment {
                 favMovieDataObject.setvoteAverage(favmoviecursor.
                         getDouble(favmoviecursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_VOTEAVERAGE)));
                 favMovieDataObject.setMovieID(favmoviecursor.
-                        getLong(favmoviecursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_SYNOPSIS)));
+                        getLong(favmoviecursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_ID)));
 
-                FavMovieobjectarray.add(i, favMovieDataObject);
+                Log.v(LOG_TAG, "favorite Movies id.." + favmoviecursor.
+                        getLong(favmoviecursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_ID)));
+
+                FavMoviedata.add(i, favMovieDataObject);
                 i++;
 
             }while(favmoviecursor.moveToNext());
             favmoviecursor.close();
 
-            movieAdapter = new MovieDataAdapter(getActivity(), FavMovieobjectarray);
+            movieAdapter = new FavMovieAdapter(getActivity(), FavMoviedata);
             mRecyclerView.setAdapter(movieAdapter);
 
-//            movieAdapter.setOnItemClickListener(new MovieDataAdapter.OnItemClickListener(){
-//
-//                @Override
-//                public void onItemClick(View itemView, int position) {
-//                    Toast.makeText(getActivity(), "Fav Movie clicked", Toast.LENGTH_SHORT).show();
-//
-//                    MovieData md = FavMovieobjectarray.get(position);
-//
-//                    Intent i = new Intent(getActivity(), DetailActivity.class);
-//                    //i.putExtra(MOVIE_KEY, md);
-//                    i.putExtra(DetailActivity.EXTRA_NAME, md);
-//                    startActivity(i);
-//
-//                }
-//            });
         }else{
 
             Toast.makeText(getActivity(), "No Movies in Favorite List", Toast.LENGTH_SHORT).show();

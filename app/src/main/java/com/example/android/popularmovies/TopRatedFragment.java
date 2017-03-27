@@ -34,7 +34,7 @@ public class TopRatedFragment extends Fragment {
 
     private RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
-    private MovieDataAdapter movieAdapter;
+    private TopRatedMovieAdapter movieAdapter;
 
     private Retrofit movieRetrofit = new Retrofit.Builder().baseUrl(MOVIEDB_API).
             addConverterFactory(GsonConverterFactory.create()).build();
@@ -42,7 +42,6 @@ public class TopRatedFragment extends Fragment {
 
     MovieDataJSON moviedataJson = new MovieDataJSON();
     private static ArrayList<MovieData> topRatedmoviedata = new ArrayList<>();
-    ArrayList<MovieData> saved_TMData = new ArrayList<MovieData>();
 
     final String sort_order = "top_rated";
 
@@ -59,7 +58,7 @@ public class TopRatedFragment extends Fragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        outState.putParcelableArrayList("P_Movies", saved_TMData);
+        outState.putParcelableArrayList("P_Movies", topRatedmoviedata);
     }
 
     @Override
@@ -105,10 +104,10 @@ public class TopRatedFragment extends Fragment {
         mLayoutManager = new GridLayoutManager(getActivity(), 2, GridLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        movieAdapter = new MovieDataAdapter(getActivity(), topRatedmoviedata);
+        movieAdapter = new TopRatedMovieAdapter(getActivity(), topRatedmoviedata);
         mRecyclerView.setAdapter(movieAdapter);
 
-        movieAdapter.setOnItemClickListener(new MovieDataAdapter.OnItemClickListener(){
+        movieAdapter.setOnItemClickListener(new TopRatedMovieAdapter.OnItemClickListener(){
 
             @Override
             public void onItemClick(View itemView, int position) {
@@ -146,10 +145,10 @@ public class TopRatedFragment extends Fragment {
 
                     Log.v(LOG_TAG, "Top Rated Movie title" + mdata.getoriginalTitle());
                 }
-                movieAdapter = new MovieDataAdapter(getActivity(), topRatedmoviedata);
+                movieAdapter = new TopRatedMovieAdapter(getActivity(), topRatedmoviedata);
                 mRecyclerView.setAdapter(movieAdapter);
 
-//                movieAdapter.setOnItemClickListener(new MovieDataAdapter.OnItemClickListener(){
+//                movieAdapter.setOnItemClickListener(new PopularMovieAdapter.OnItemClickListener(){
 //
 //                    @Override
 //                    public void onItemClick(View itemView, int position) {

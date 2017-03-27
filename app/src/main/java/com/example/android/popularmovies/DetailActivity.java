@@ -148,21 +148,6 @@ public class DetailActivity extends AppCompatActivity {
 
                 //getTrailers(movie_id);
 
-                trailersListView = (GridView) rootView.findViewById(R.id.trailers_list_view);
-
-//                trailerAdapter = new MovieTrailersAdapter(getActivity(), Name, Key, trailers_count);
-//                trailersListView.setAdapter(trailerAdapter);
-//
-//                trailersListView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
-//
-//                    @Override
-//                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-//
-//                        Toast.makeText(getActivity(), "Trailer clicked", Toast.LENGTH_SHORT).show();
-//                    }
-//
-//                });
-
                 favMovieStar = (ImageButton) rootView.findViewById(R.id.movie_favorite);
 
                 favMovieStar.setOnClickListener(new View.OnClickListener() {
@@ -260,6 +245,8 @@ public class DetailActivity extends AppCompatActivity {
                 TextView tv = (TextView) rootView.findViewById(R.id.movie_detail_vote_average);
                 tv.setText(stringdouble);
 
+                trailersListView = (GridView) rootView.findViewById(R.id.trailers_list_view);
+
             }
 
             return rootView;
@@ -296,6 +283,7 @@ public class DetailActivity extends AppCompatActivity {
             Log.v(LOG_TAG, "Deleted Movie Data "+ favM_id);
 
         }
+
 
         public Boolean MovieMarkedFav(long favM_id){
 
