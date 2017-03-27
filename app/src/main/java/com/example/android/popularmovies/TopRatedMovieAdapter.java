@@ -16,7 +16,7 @@ import java.util.ArrayList;
  * Created by PallaviNishanth on 2/23/17.
  */
 
-public class MovieDataAdapter extends RecyclerView.Adapter<MovieDataAdapter.ViewHolder> {
+public class TopRatedMovieAdapter extends RecyclerView.Adapter<TopRatedMovieAdapter.ViewHolder> {
 
     private Context mContext;
 
@@ -24,7 +24,7 @@ public class MovieDataAdapter extends RecyclerView.Adapter<MovieDataAdapter.View
 
     String baseURL = "http://image.tmdb.org/t/p/w185/";
 
-    private final String LOG_TAG = MovieDataAdapter.class.getSimpleName();
+    private final String LOG_TAG = TopRatedMovieAdapter.class.getSimpleName();
 
 
     public interface OnItemClickListener {
@@ -37,7 +37,7 @@ public class MovieDataAdapter extends RecyclerView.Adapter<MovieDataAdapter.View
         this.listener = listener;
     }
 
-    public MovieDataAdapter(Context context, ArrayList<MovieData> m_data){
+    public TopRatedMovieAdapter(Context context, ArrayList<MovieData> m_data){
 
         this.mContext = context;
         this.mData = m_data;
@@ -46,7 +46,7 @@ public class MovieDataAdapter extends RecyclerView.Adapter<MovieDataAdapter.View
 
     // Create new views (invoked by the layout manager)
     @Override
-    public MovieDataAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public TopRatedMovieAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         // create a new view
         View mview = LayoutInflater.from(parent.getContext())

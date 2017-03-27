@@ -35,7 +35,7 @@ public class PopularFragment extends Fragment {
 
     private RecyclerView popRecyclerView;
     private RecyclerView.LayoutManager popLayoutManager;
-    private MovieDataAdapter popmovieAdapter;
+    private PopularMovieAdapter popmovieAdapter;
 
     private Retrofit movieRetrofit = new Retrofit.Builder().baseUrl(MOVIEDB_API).
             addConverterFactory(GsonConverterFactory.create()).build();
@@ -44,8 +44,6 @@ public class PopularFragment extends Fragment {
     MovieDataJSON moviedataJson = new MovieDataJSON();
 
     private static ArrayList<MovieData> popularmoviedata = new ArrayList<>();
-    ArrayList<MovieData> saved_PMData = new ArrayList<MovieData>();
-
 
     final String sort_order = "popular";
 
@@ -62,7 +60,7 @@ public class PopularFragment extends Fragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        outState.putParcelableArrayList("P_Movies", saved_PMData);
+        outState.putParcelableArrayList("P_Movies", popularmoviedata);
     }
 
     @Override
@@ -114,10 +112,10 @@ public class PopularFragment extends Fragment {
         popLayoutManager = new GridLayoutManager(getActivity(), 2, GridLayoutManager.VERTICAL, false);
         popRecyclerView.setLayoutManager(popLayoutManager);
 
-        popmovieAdapter = new MovieDataAdapter(getActivity(), popularmoviedata);
+        popmovieAdapter = new PopularMovieAdapter(getActivity(), popularmoviedata);
         popRecyclerView.setAdapter(popmovieAdapter);
 
-        popmovieAdapter.setOnItemClickListener(new MovieDataAdapter.OnItemClickListener(){
+        popmovieAdapter.setOnItemClickListener(new PopularMovieAdapter.OnItemClickListener(){
 
             @Override
             public void onItemClick(View itemView, int position) {
@@ -155,10 +153,10 @@ public class PopularFragment extends Fragment {
 
                     Log.v(LOG_TAG, "Popular Movie title" + mdata.getoriginalTitle());
                 }
-                popmovieAdapter = new MovieDataAdapter(getActivity(), popularmoviedata);
+                popmovieAdapter = new PopularMovieAdapter(getActivity(), popularmoviedata);
                 popRecyclerView.setAdapter(popmovieAdapter);
 
-//                popmovieAdapter.setOnItemClickListener(new MovieDataAdapter.OnItemClickListener(){
+//                popmovieAdapter.setOnItemClickListener(new PopularMovieAdapter.OnItemClickListener(){
 //
 //                    @Override
 //                    public void onItemClick(View itemView, int position) {

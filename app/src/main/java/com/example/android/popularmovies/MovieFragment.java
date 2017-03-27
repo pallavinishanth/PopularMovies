@@ -56,8 +56,8 @@ public class MovieFragment extends Fragment {
 
     private RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
-    private MovieDataAdapter movieAdapter;
-    private MovieDataAdapter FavmovieAdapter;
+    private PopularMovieAdapter movieAdapter;
+    private PopularMovieAdapter FavmovieAdapter;
     private Retrofit movieRetrofit = new Retrofit.Builder().baseUrl(MOVIEDB_API).
             addConverterFactory(GsonConverterFactory.create()).build();
     MovieRetrofitAPI retrofitAPI = movieRetrofit.create(MovieRetrofitAPI.class);
@@ -155,10 +155,10 @@ public class MovieFragment extends Fragment {
 
             Log.v(LOG_TAG, "Sort Order is Favorites");
 
-            FavmovieAdapter = new MovieDataAdapter(getActivity(), FavMovieobjectarray);
+            FavmovieAdapter = new PopularMovieAdapter(getActivity(), FavMovieobjectarray);
             mRecyclerView.setAdapter(FavmovieAdapter);
 
-            FavmovieAdapter.setOnItemClickListener(new MovieDataAdapter.OnItemClickListener(){
+            FavmovieAdapter.setOnItemClickListener(new PopularMovieAdapter.OnItemClickListener(){
 
                 @Override
                 public void onItemClick(View itemView, int position) {
@@ -208,7 +208,7 @@ public class MovieFragment extends Fragment {
 //
 //                    Log.v(LOG_TAG, "Movie title" + mdata.getoriginalTitle());
 //                }
-                movieAdapter = new MovieDataAdapter(getActivity(), moviedata);
+                movieAdapter = new PopularMovieAdapter(getActivity(), moviedata);
                 mRecyclerView.setAdapter(movieAdapter);
             }
 
@@ -252,7 +252,7 @@ public class MovieFragment extends Fragment {
                 favMovieDataObject.setvoteAverage(favmoviecursor.
                         getDouble(favmoviecursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_VOTEAVERAGE)));
                 favMovieDataObject.setMovieID(favmoviecursor.
-                        getLong(favmoviecursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_SYNOPSIS)));
+                        getLong(favmoviecursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_ID)));
 
                 FavMovieobjectarray.add(i, favMovieDataObject);
                 i++;
@@ -283,10 +283,10 @@ public class MovieFragment extends Fragment {
         mLayoutManager = new GridLayoutManager(getActivity(), 2, GridLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        movieAdapter = new MovieDataAdapter(getActivity(), moviedata);
+        movieAdapter = new PopularMovieAdapter(getActivity(), moviedata);
         mRecyclerView.setAdapter(movieAdapter);
 
-        movieAdapter.setOnItemClickListener(new MovieDataAdapter.OnItemClickListener(){
+        movieAdapter.setOnItemClickListener(new PopularMovieAdapter.OnItemClickListener(){
 
             @Override
             public void onItemClick(View itemView, int position) {
