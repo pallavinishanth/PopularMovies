@@ -9,7 +9,7 @@ import java.util.ArrayList;
 public class ReviewsJSON {
 
     private Long tresults, tpages, page, id;
-    private ArrayList<MovieData> results;
+    private ArrayList<ReviewsData> results;
 
     public Long getpage(){
 
@@ -49,12 +49,12 @@ public class ReviewsJSON {
         this.tresults = tresults;
     }
 
-    public ArrayList<MovieData> getMovieresults(){
+    public ArrayList<ReviewsData> getReviewsresults(){
 
         return results;
     }
 
-    public void setMovieresults(ArrayList<MovieData> results){
+    public void setReviewresults(ArrayList<ReviewsData> results){
 
         this.results = results;
     }

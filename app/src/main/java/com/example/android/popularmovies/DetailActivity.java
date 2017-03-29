@@ -24,6 +24,8 @@ import android.widget.Toast;
 
 import com.example.android.popularmovies.Network.MovieData;
 import com.example.android.popularmovies.Network.MovieRetrofitAPI;
+import com.example.android.popularmovies.Network.ReviewsData;
+import com.example.android.popularmovies.Network.ReviewsJSON;
 import com.example.android.popularmovies.Network.TrailerData;
 import com.example.android.popularmovies.Network.TrailerJSON;
 import com.example.android.popularmovies.data.MovieContract;
@@ -64,17 +66,18 @@ public class DetailActivity extends AppCompatActivity {
 
         private RecyclerView tRecyclerView;
         private RecyclerView.LayoutManager tLayoutManager;
-        private MovieTrailersReAdapter trailerReAdapter;
+        private MovieTrailersAdapter trailerReAdapter;
 
         static Long m_id_d;
         static Long movie_id;
         GridView trailersGridView;
         TrailerJSON t_JSON = new TrailerJSON();
+        ReviewsJSON r_JSON = new ReviewsJSON();
         static int trailers_count;
-        private MovieTrailersAdapter trailerAdapter;
         private ArrayList<String> Name = new ArrayList<String>();
         private ArrayList<String> Key = new ArrayList<String>();
         private static ArrayList<TrailerData> movietrailersdata = new ArrayList<>();
+        private static ArrayList<ReviewsData> moviereviewsdata = new ArrayList<>();
 
         ImageButton favMovieStar;
         private static Bundle bundle = new Bundle();
@@ -253,10 +256,10 @@ public class DetailActivity extends AppCompatActivity {
                 tLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
                 tRecyclerView.setLayoutManager(tLayoutManager);
 
-                trailerReAdapter = new MovieTrailersReAdapter(getActivity(), Name, Key, trailers_count);
-                tRecyclerView.setAdapter(trailerReAdapter);
+                trailerReAdapter = new MovieTrailersAdapter(getActivity(), Name, Key, trailers_count);
+                //tRecyclerView.setAdapter(trailerReAdapter);
 
-                trailerReAdapter.setOnItemClickListener(new MovieTrailersReAdapter.OnItemClickListener(){
+                trailerReAdapter.setOnItemClickListener(new MovieTrailersAdapter.OnItemClickListener(){
 
                     @Override
                     public void onItemClick(View itemView, int position) {
@@ -352,7 +355,7 @@ public class DetailActivity extends AppCompatActivity {
                         Name.add(tdata.getName());
                         Key.add(tdata.getKey());
                     }
-                    trailerReAdapter = new MovieTrailersReAdapter(getActivity(), Name, Key, trailers_count);
+                    trailerReAdapter = new MovieTrailersAdapter(getActivity(), Name, Key, trailers_count);
                     tRecyclerView.setAdapter(trailerReAdapter);
 
                 }
@@ -361,10 +364,33 @@ public class DetailActivity extends AppCompatActivity {
                 public void onFailure(Throwable t) {
 
                     Log.v(LOG_TAG, "On Failure" + t.toString());
+
                 }
 
             });
 
+        }
+
+        public void getReviews(Long R_id){
+
+            Log.v(LOG_TAG, "Get Reviews list" + R_id);
+
+            Call<ReviewsJSON> reviewslistcall = retrofitAPI.REVIEWS_DATA_CALL(R_id, BuildConfig.MOVIEDB_API_KEY);
+
+            reviewslistcall.enqueue(new Callback<ReviewsJSON>() {
+                @Override
+                public void onResponse(Response<ReviewsJSON> response, Retrofit retrofit) {
+
+                    Log.v(LOG_TAG, "Reviews Response is " + response.isSuccess());
+
+                    moviereviewsdata = response.body().getReviewsresults();
+                }
+
+                @Override
+                public void onFailure(Throwable t) {
+
+                }
+            });
         }
     }
 }
