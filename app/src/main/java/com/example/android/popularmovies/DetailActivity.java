@@ -9,15 +9,14 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -63,17 +62,19 @@ public class DetailActivity extends AppCompatActivity {
                 addConverterFactory(GsonConverterFactory.create()).build();
         MovieRetrofitAPI retrofitAPI = movieRetrofit.create(MovieRetrofitAPI.class);
 
+        private RecyclerView tRecyclerView;
+        private RecyclerView.LayoutManager tLayoutManager;
+        private MovieTrailersReAdapter trailerReAdapter;
+
         static Long m_id_d;
         static Long movie_id;
-        GridView trailersListView;
+        GridView trailersGridView;
         TrailerJSON t_JSON = new TrailerJSON();
         static int trailers_count;
         private MovieTrailersAdapter trailerAdapter;
         private static ArrayList<String> Name = new ArrayList<String>();
         private static ArrayList<String> Key = new ArrayList<String>();
         private static ArrayList<TrailerData> movietrailersdata = new ArrayList<>();
-        private HorizontalScrollView trailerView;
-        private LinearLayoutManager trailerLayoutManager;
 
         ImageButton favMovieStar;
         private static Bundle bundle = new Bundle();
@@ -245,7 +246,35 @@ public class DetailActivity extends AppCompatActivity {
                 TextView tv = (TextView) rootView.findViewById(R.id.movie_detail_vote_average);
                 tv.setText(stringdouble);
 
-                trailersListView = (GridView) rootView.findViewById(R.id.trailers_list_view);
+               // trailersGridView = (GridView) rootView.findViewById(R.id.trailers_list_view);
+                tRecyclerView = (RecyclerView) rootView.findViewById(R.id.trailer_recycler_view);
+                tRecyclerView.setHasFixedSize(true);
+
+                tLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
+                tRecyclerView.setLayoutManager(tLayoutManager);
+
+                trailerReAdapter = new MovieTrailersReAdapter(getActivity(), Name, Key, trailers_count);
+                tRecyclerView.setAdapter(trailerReAdapter);
+
+                trailerReAdapter.setOnItemClickListener(new MovieTrailersReAdapter.OnItemClickListener(){
+
+                    @Override
+                    public void onItemClick(View itemView, int position) {
+
+                        Toast.makeText(getActivity(), "Trailer clicked", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+
+//                    trailersGridView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+//
+//                        @Override
+//                        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+//
+//                            Toast.makeText(getActivity(), "Trailer clicked", Toast.LENGTH_SHORT).show();
+//                        }
+//
+//                    });
 
             }
 
@@ -323,18 +352,8 @@ public class DetailActivity extends AppCompatActivity {
                         Name.add(tdata.getName());
                         Key.add(tdata.getKey());
                     }
-                    trailerAdapter = new MovieTrailersAdapter(getActivity(), Name, Key, trailers_count);
-                    trailersListView.setAdapter(trailerAdapter);
-
-                    trailersListView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
-
-                        @Override
-                        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
-                            Toast.makeText(getActivity(), "Trailer clicked", Toast.LENGTH_SHORT).show();
-                        }
-
-                    });
+                    trailerReAdapter = new MovieTrailersReAdapter(getActivity(), Name, Key, trailers_count);
+                    tRecyclerView.setAdapter(trailerReAdapter);
 
                 }
 
