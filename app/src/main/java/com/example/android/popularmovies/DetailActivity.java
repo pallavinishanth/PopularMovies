@@ -72,8 +72,8 @@ public class DetailActivity extends AppCompatActivity {
         TrailerJSON t_JSON = new TrailerJSON();
         static int trailers_count;
         private MovieTrailersAdapter trailerAdapter;
-        private static ArrayList<String> Name = new ArrayList<String>();
-        private static ArrayList<String> Key = new ArrayList<String>();
+        private ArrayList<String> Name = new ArrayList<String>();
+        private ArrayList<String> Key = new ArrayList<String>();
         private static ArrayList<TrailerData> movietrailersdata = new ArrayList<>();
 
         ImageButton favMovieStar;
