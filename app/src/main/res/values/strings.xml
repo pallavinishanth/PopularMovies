@@ -31,8 +31,10 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
     <!-- Strings related to Details -->
-    <string name="Trailers"> Trailers</string>
+    <string name="Trailers">Trailers</string>
 
-    <string name="Reviews"> Reviews</string>
+    <string name="Reviews">Reviews</string>
+
+    <string name="author_prefix">A review by </string>
 
 </resources>
