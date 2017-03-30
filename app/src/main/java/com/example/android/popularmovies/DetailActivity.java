@@ -60,6 +60,7 @@ public class DetailActivity extends AppCompatActivity {
     public static class DetailFragment extends Fragment {
 
         final String MOVIEDB_API = "http://api.themoviedb.org/3/movie/";
+        final String YOUTUBE_URL = "http://www.youtube.com/watch";
         private Retrofit movieRetrofit = new Retrofit.Builder().baseUrl(MOVIEDB_API).
                 addConverterFactory(GsonConverterFactory.create()).build();
         MovieRetrofitAPI retrofitAPI = movieRetrofit.create(MovieRetrofitAPI.class);
@@ -67,6 +68,12 @@ public class DetailActivity extends AppCompatActivity {
         private RecyclerView tRecyclerView;
         private RecyclerView.LayoutManager tLayoutManager;
         private MovieTrailersAdapter trailerReAdapter;
+        private TextView trailer_header;
+
+        private RecyclerView rRecyclerView;
+        private RecyclerView.LayoutManager rLayoutManager;
+        private MovieReviewsAdapter reviewsReAdapter;
+        private TextView review_header;
 
         static Long m_id_d;
         static Long movie_id;
@@ -74,10 +81,14 @@ public class DetailActivity extends AppCompatActivity {
         TrailerJSON t_JSON = new TrailerJSON();
         ReviewsJSON r_JSON = new ReviewsJSON();
         static int trailers_count;
+        static int reviews_count;
         private ArrayList<String> Name = new ArrayList<String>();
         private ArrayList<String> Key = new ArrayList<String>();
+        private ArrayList<String> AuthorName = new ArrayList<String>();
+        private ArrayList<String> AuthorReview = new ArrayList<String>();
         private static ArrayList<TrailerData> movietrailersdata = new ArrayList<>();
         private static ArrayList<ReviewsData> moviereviewsdata = new ArrayList<>();
+        private Uri uri;
 
         ImageButton favMovieStar;
         private static Bundle bundle = new Bundle();
@@ -105,6 +116,7 @@ public class DetailActivity extends AppCompatActivity {
             if((Name.isEmpty() && Key.isEmpty()) || m_id_d !=movie_id){
 
                 getTrailers(movie_id);
+                getReviews(movie_id);
                 m_id_d = movie_id;
             }
 
@@ -132,6 +144,9 @@ public class DetailActivity extends AppCompatActivity {
             Log.v(LOG_TAG, "OnCreate View");
 
             View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
+
+            trailer_header = (TextView) rootView.findViewById(R.id.Trailer);
+            review_header = (TextView) rootView.findViewById(R.id.Reviews);
 
 
             final Toolbar toolbar = (Toolbar)rootView.findViewById(R.id.toolbar);
@@ -265,19 +280,21 @@ public class DetailActivity extends AppCompatActivity {
                     public void onItemClick(View itemView, int position) {
 
                         Toast.makeText(getActivity(), "Trailer clicked", Toast.LENGTH_SHORT).show();
+
+                        uri = uri.parse(YOUTUBE_URL).buildUpon()
+                                .appendQueryParameter("v", Key.get(position)).build();
+                        Intent YT_Intent = new Intent(Intent.ACTION_VIEW, uri);
+                        startActivity(YT_Intent);
                     }
                 });
 
+                rRecyclerView = (RecyclerView) rootView.findViewById(R.id.reviews_recycler_view);
+                rRecyclerView.setHasFixedSize(true);
 
-//                    trailersGridView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
-//
-//                        @Override
-//                        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-//
-//                            Toast.makeText(getActivity(), "Trailer clicked", Toast.LENGTH_SHORT).show();
-//                        }
-//
-//                    });
+                rLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
+                rRecyclerView.setLayoutManager(rLayoutManager);
+
+                reviewsReAdapter = new MovieReviewsAdapter(getActivity(), AuthorName, AuthorReview, reviews_count);
 
             }
 
@@ -349,6 +366,10 @@ public class DetailActivity extends AppCompatActivity {
 
                     Log.v(LOG_TAG, "Trailers count" + trailers_count);
 
+                    if(trailers_count==0){
+                        trailer_header.setText("No Trailers are found for this Movie");
+                    }
+
                     for(TrailerData tdata : movietrailersdata){
 
                         Log.v(LOG_TAG, "Trailers Names" + tdata.getName());
@@ -384,11 +405,30 @@ public class DetailActivity extends AppCompatActivity {
                     Log.v(LOG_TAG, "Reviews Response is " + response.isSuccess());
 
                     moviereviewsdata = response.body().getReviewsresults();
+                    reviews_count = moviereviewsdata.size();
+
+                    Log.v(LOG_TAG, "Reviews count" + reviews_count);
+
+                    if(reviews_count==0){
+
+                        review_header.setText("No Reviews are found for this Movie");
+                    }
+
+                    for(ReviewsData rdata : moviereviewsdata){
+                        Log.v(LOG_TAG, "Reviews Author Names : " + rdata.getAuthor());
+
+                        AuthorName.add(rdata.getAuthor());
+                        AuthorReview.add(rdata.getContent());
+
+                    }
+                    reviewsReAdapter = new MovieReviewsAdapter(getActivity(), AuthorName, AuthorReview, reviews_count);
+                    rRecyclerView.setAdapter(reviewsReAdapter);
                 }
 
                 @Override
                 public void onFailure(Throwable t) {
 
+                    Log.v(LOG_TAG, "On Failure" + t.toString());
                 }
             });
         }
