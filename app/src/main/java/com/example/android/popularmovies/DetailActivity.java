@@ -1,10 +1,12 @@
 package com.example.android.popularmovies;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
@@ -16,7 +18,6 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -61,6 +62,8 @@ public class DetailActivity extends AppCompatActivity {
 
         final String MOVIEDB_API = "http://api.themoviedb.org/3/movie/";
         final String YOUTUBE_URL = "http://www.youtube.com/watch";
+        final String baseURL = "http://image.tmdb.org/t/p/w185/";
+
         private Retrofit movieRetrofit = new Retrofit.Builder().baseUrl(MOVIEDB_API).
                 addConverterFactory(GsonConverterFactory.create()).build();
         MovieRetrofitAPI retrofitAPI = movieRetrofit.create(MovieRetrofitAPI.class);
@@ -77,7 +80,7 @@ public class DetailActivity extends AppCompatActivity {
 
         static Long m_id_d;
         static Long movie_id;
-        GridView trailersGridView;
+
         TrailerJSON t_JSON = new TrailerJSON();
         ReviewsJSON r_JSON = new ReviewsJSON();
         static int trailers_count;
@@ -92,11 +95,9 @@ public class DetailActivity extends AppCompatActivity {
 
         ImageButton favMovieStar;
         private static Bundle bundle = new Bundle();
-        boolean starClicked = false;
+        boolean markedFav, insert_result, delete_result;
 
         private final String LOG_TAG = DetailFragment.class.getSimpleName();
-
-        String baseURL = "http://image.tmdb.org/t/p/w185/";
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -113,11 +114,12 @@ public class DetailActivity extends AppCompatActivity {
 
             Log.v(LOG_TAG, "On Start");
 
-            if((Name.isEmpty() && Key.isEmpty()) || m_id_d !=movie_id){
+            if(Name.isEmpty() && AuthorName.isEmpty()) {
 
+                Log.v(LOG_TAG, "Data is Empty");
                 getTrailers(movie_id);
                 getReviews(movie_id);
-                m_id_d = movie_id;
+
             }
 
         }
@@ -126,17 +128,55 @@ public class DetailActivity extends AppCompatActivity {
 
         }
 
-//        @Override
-//        public void onPause() {
-//            super.onPause();
-//            bundle.putBoolean("ToggleButtonState", starClicked);
-//        }
-//
-//        @Override
-//        public void onResume() {
-//            super.onResume();
-//            starClicked = bundle.getBoolean("ToggleButtonState",false);
-//        }
+        @Override
+        public void onSaveInstanceState(Bundle outState) {
+            super.onSaveInstanceState(outState);
+
+            Log.v(LOG_TAG, "onSaveInstanceState");
+
+            outState.putBoolean("M_marked", markedFav);
+            outState.putLong("M_ID", movie_id);
+            outState.putStringArrayList("Name", Name);
+            outState.putStringArrayList("Key", Key);
+            outState.putStringArrayList("A_Name", AuthorName);
+            outState.putStringArrayList("A_Review", AuthorReview);
+            outState.putInt("No_Trailers", trailers_count);
+            outState.putInt("No_Reviews", reviews_count);
+
+        }
+
+        @Override
+        public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+            super.onActivityCreated(savedInstanceState);
+
+            if(savedInstanceState!=null){
+
+                Log.v(LOG_TAG, "savedInstanceState not null");
+
+                markedFav = savedInstanceState.getBoolean("M_marked");
+                movie_id = savedInstanceState.getLong("M_ID");
+                Name = savedInstanceState.getStringArrayList("Name");
+
+                Log.v(LOG_TAG, "savedInstanceState not null Name:" + Name.get(0));
+                Key = savedInstanceState.getStringArrayList("Key");
+                AuthorName = savedInstanceState.getStringArrayList("A_Name");
+                AuthorReview = savedInstanceState.getStringArrayList("A_Review");
+                trailers_count = savedInstanceState.getInt("No_Trailers");
+                reviews_count = savedInstanceState.getInt("No_Reviews");
+
+                trailerReAdapter = new MovieTrailersAdapter(getActivity(), Name, Key, trailers_count);
+                tRecyclerView.setAdapter(trailerReAdapter);
+                reviewsReAdapter = new MovieReviewsAdapter(getActivity(), AuthorName, AuthorReview, reviews_count);
+                rRecyclerView.setAdapter(reviewsReAdapter);
+            }
+        }
+
+        @Override
+        public void onPause() {
+            super.onPause();
+
+
+        }
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -154,7 +194,6 @@ public class DetailActivity extends AppCompatActivity {
             ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
             Intent i = getActivity().getIntent();
-            //getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
 
 
             if(i !=null && i.hasExtra(EXTRA_NAME)){
@@ -165,40 +204,58 @@ public class DetailActivity extends AppCompatActivity {
 
                 Log.v(LOG_TAG, "Popular Movies ID" + movie_id);
 
-                //getTrailers(movie_id);
-
                 favMovieStar = (ImageButton) rootView.findViewById(R.id.movie_favorite);
+
+                markedFav = MovieMarkedFav(mdata.getMovieID());
+
+                if(markedFav){
+
+                    favMovieStar.setImageResource(android.R.drawable.btn_star_big_on);
+
+                }else {
+
+                    favMovieStar.setImageResource(android.R.drawable.btn_star_big_off);
+                }
 
                 favMovieStar.setOnClickListener(new View.OnClickListener() {
 
                     @Override
                     public void onClick(View arg0) {
 
-                        if(starClicked==true){
-                            favMovieStar.setImageResource(android.R.drawable.btn_star_big_off);
-                            starClicked = false;
-                            Toast.makeText(getActivity(),
-                                    "ImageButton is Unclicked!", Toast.LENGTH_SHORT).show();
+                        if(markedFav){
 
-                            DeleteFavMovieData(mdata.getMovieID());
-                        }else {
+                            delete_result = DeleteFavMovieData(mdata.getMovieID());
 
-                            favMovieStar.setImageResource(android.R.drawable.btn_star_big_on);
-                            starClicked = true;
-
-                            Toast.makeText(getActivity(),
-                                    "ImageButton is clicked!", Toast.LENGTH_SHORT).show();
-
-                            if(MovieMarkedFav(mdata.getMovieID())){
-
+                            if(delete_result){
+                                markedFav = false;
+                                favMovieStar.setImageResource(android.R.drawable.btn_star_big_off);
                                 Toast.makeText(getActivity(),
-                                        "Movie Already Marked Favorite", Toast.LENGTH_SHORT).show();
+                                        "Deleted from Favorites", Toast.LENGTH_SHORT).show();
 
                             }else{
 
-                                insertFavMovieData(mdata.getMovieID(), mdata.getoriginalTitle(),
-                                        mdata.getreleaseDate(), mdata.getPosterPath(),
-                                        mdata.getvoteAverage(), mdata.getoverview());
+                                favMovieStar.setImageResource(android.R.drawable.btn_star_big_on);
+                                Toast.makeText(getActivity(),
+                                        "Deletion Failed", Toast.LENGTH_SHORT).show();
+                            }
+                        }else {
+
+                            insert_result = insertFavMovieData(mdata.getMovieID(),
+                                    mdata.getoriginalTitle(), mdata.getreleaseDate(),
+                                    mdata.getPosterPath(), mdata.getvoteAverage(), mdata.getoverview());
+
+                            if(insert_result){
+
+                                markedFav = true;
+                                favMovieStar.setImageResource(android.R.drawable.btn_star_big_on);
+                                Toast.makeText(getActivity(),
+                                        "Added to Favorites", Toast.LENGTH_SHORT).show();
+
+                            }else{
+
+                                favMovieStar.setImageResource(android.R.drawable.btn_star_big_off);
+                                Toast.makeText(getActivity(),
+                                        "Adding to Fav Failed", Toast.LENGTH_SHORT).show();
                             }
 
                         }
@@ -206,12 +263,11 @@ public class DetailActivity extends AppCompatActivity {
                 });
 
                 String title = mdata.getoriginalTitle();
+                CollapsingToolbarLayout collapsingToolbar =
+                        (CollapsingToolbarLayout) rootView.findViewById(R.id.collapsing_toolbar);
 
                 if(!title.isEmpty()){
-//                    TextView tv = (TextView) rootView.findViewById(R.id.movie_detail_title);
-//                    tv.setText(title);
-                    CollapsingToolbarLayout collapsingToolbar =
-                            (CollapsingToolbarLayout) rootView.findViewById(R.id.collapsing_toolbar);
+
                     collapsingToolbar.setTitle(title);
                     collapsingToolbar.setExpandedTitleGravity(Gravity.CENTER_HORIZONTAL);
                     collapsingToolbar.setCollapsedTitleTextAppearance(R.style.CollapsedAppBar);
@@ -220,6 +276,7 @@ public class DetailActivity extends AppCompatActivity {
 
                 } else {
                     title = "Movie Title not found";
+                    collapsingToolbar.setTitle(title);
 
                 }
 
@@ -236,24 +293,28 @@ public class DetailActivity extends AppCompatActivity {
                 }
 
                 String overview = mdata.getoverview();
+                TextView otv = (TextView) rootView.findViewById(R.id.movie_detail_overview);
 
                 if(!overview.isEmpty()){
-                    TextView tv = (TextView) rootView.findViewById(R.id.movie_detail_overview);
-                    tv.setText(overview);
+
+                    otv.setText(overview);
 
                 } else {
                     overview = "Movie overview not found";
+                    otv.setText(overview);
 
                 }
 
                 String rdate = mdata.getreleaseDate();
+                TextView rd_tv = (TextView) rootView.findViewById(R.id.movie_detail_release_date);
 
                 if(!rdate.isEmpty()){
-                    TextView tv = (TextView) rootView.findViewById(R.id.movie_detail_release_date);
-                    tv.setText(rdate);
+
+                    rd_tv.setText(rdate);
 
                 } else {
                     rdate = "Movie release date not found";
+                    rd_tv.setText(rdate);
 
                 }
 
@@ -264,7 +325,6 @@ public class DetailActivity extends AppCompatActivity {
                 TextView tv = (TextView) rootView.findViewById(R.id.movie_detail_vote_average);
                 tv.setText(stringdouble);
 
-               // trailersGridView = (GridView) rootView.findViewById(R.id.trailers_list_view);
                 tRecyclerView = (RecyclerView) rootView.findViewById(R.id.trailer_recycler_view);
                 tRecyclerView.setHasFixedSize(true);
 
@@ -272,7 +332,6 @@ public class DetailActivity extends AppCompatActivity {
                 tRecyclerView.setLayoutManager(tLayoutManager);
 
                 trailerReAdapter = new MovieTrailersAdapter(getActivity(), Name, Key, trailers_count);
-                //tRecyclerView.setAdapter(trailerReAdapter);
 
                 trailerReAdapter.setOnItemClickListener(new MovieTrailersAdapter.OnItemClickListener(){
 
@@ -301,7 +360,7 @@ public class DetailActivity extends AppCompatActivity {
             return rootView;
         }
 
-        public void insertFavMovieData(long m_id, String title, String release_date, String poster_path,
+        public boolean insertFavMovieData(long m_id, String title, String release_date, String poster_path,
                                     double vote_average, String mOverview){
 
 
@@ -319,17 +378,36 @@ public class DetailActivity extends AppCompatActivity {
                     MovieContract.MovieEntry.CONTENT_URI,
                     mvalues);
 
-            Log.v(LOG_TAG, "Inserted Movie Data "+ title);
+            Long result_id = ContentUris.parseId(insertedUri);
+
+            if(result_id>0 && result_id!=-1){
+                Log.v(LOG_TAG, "Insertion Successfuly "+ title);
+                return true;
+
+            }else {
+
+                Log.v(LOG_TAG, "Insertion failed "+ title);
+                return false;
+            }
 
         }
 
-        public void DeleteFavMovieData(long favM_id){
+        public boolean DeleteFavMovieData(long favM_id){
 
-            getActivity().getContentResolver()
+            int no_rows_deleted = getActivity().getContentResolver()
                     .delete(MovieContract.MovieEntry.buildFavMovieUri(favM_id),
                             MovieContract.MovieEntry.COLUMN_MOVIE_ID + "=" + favM_id, null);
 
-            Log.v(LOG_TAG, "Deleted Movie Data "+ favM_id);
+            Log.v(LOG_TAG, "Deleted Movie Data "+ favM_id + "rows " + no_rows_deleted);
+
+            if(no_rows_deleted > 0){
+
+                return true;
+
+            }else {
+
+                return false;
+            }
 
         }
 

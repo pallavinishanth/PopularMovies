@@ -28,43 +28,20 @@ public class FavMovieFragment extends Fragment {
     private RecyclerView.LayoutManager mLayoutManager;
     private FavMovieAdapter movieAdapter;
 
-    public static ArrayList<MovieData> FavMoviedata = new ArrayList<MovieData>();
+    private ArrayList<MovieData> FavMoviedata = new ArrayList<MovieData>();
 
     private final String LOG_TAG = FavMovieFragment.class.getSimpleName();
-
-    String MOVIE_KEY = "FavMovie";
 
     public FavMovieFragment() {
         // Required empty public constructor
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        outState.putParcelableArrayList("P_Movies", FavMoviedata);
-    }
-
-    @Override
     public void onStart() {
         super.onStart();
 
-        if(FavMoviedata.isEmpty()){
-            getFavMovies();
+        getFavMovies();
 
-        }
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        //Toast.makeText(getActivity(), "onPause FavoriteFragment():" + TAG, Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        //Toast.makeText(getActivity(), "onResume FavoriteFragment():" + TAG, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -72,12 +49,6 @@ public class FavMovieFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         Log.v(LOG_TAG, "on create view.. ");
-
-        if(savedInstanceState!=null){
-
-            Log.v(LOG_TAG, "Saved Instance Not null.. ");
-            FavMoviedata = savedInstanceState.getParcelableArrayList("P_Movies");
-        }
 
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_movie, container, false);
@@ -119,6 +90,8 @@ public class FavMovieFragment extends Fragment {
 
         favmoviecursor = getActivity().getContentResolver().
                 query(MovieContract.MovieEntry.CONTENT_URI, null, null, null, null, null);
+
+        FavMoviedata.clear();
 
         if(favmoviecursor.getCount()!=0){
 
