@@ -9,7 +9,9 @@
     <dimen name="linear_layout_margin">8dp</dimen>
     <dimen name="release_date_margin">16dp</dimen>
     <dimen name="vote_average_margin">16dp</dimen>
+    <dimen name="star_padding">8dp</dimen>
     <dimen name="overview_text_size">16sp</dimen>
     <dimen name="overview_margin">8dp</dimen>
-    <dimen name="appbar_height">200dp</dimen>
+    <dimen name="appbar_height">256dp</dimen>
+    <dimen name="heading_size">24sp</dimen>
 </resources>
