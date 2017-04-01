@@ -102,7 +102,6 @@ public class DetailActivity extends AppCompatActivity {
         @Override
         public void onCreate(Bundle savedInstanceState) {
 
-            Log.v(LOG_TAG, "OnCreate");
             super.onCreate(savedInstanceState);
 
 
