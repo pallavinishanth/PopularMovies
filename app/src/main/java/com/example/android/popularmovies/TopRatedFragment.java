@@ -1,7 +1,10 @@
 package com.example.android.popularmovies;
 
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
@@ -45,8 +48,6 @@ public class TopRatedFragment extends Fragment {
 
     final String sort_order = "top_rated";
 
-    String MOVIE_KEY = "TopMovie";
-
     private final String LOG_TAG = TopRatedFragment.class.getSimpleName();
 
     public TopRatedFragment() {
@@ -65,22 +66,20 @@ public class TopRatedFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
-        if(topRatedmoviedata.isEmpty()){
+        if(isOnline() && topRatedmoviedata.isEmpty()){
             getTopRatedMovie();
         }
 
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        //Toast.makeText(getActivity(), "onPause TopRatedFragment():" + TAG, Toast.LENGTH_SHORT).show();
-    }
+    public boolean isOnline(){
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        //Toast.makeText(getActivity(), "onResume TopRatedFragment():" + TAG, Toast.LENGTH_SHORT).show();
+        ConnectivityManager conn_m =
+                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo netInfo = conn_m.getActiveNetworkInfo();
+
+        return ((netInfo !=null) && (netInfo.isConnected()));
     }
 
     @Override
@@ -116,7 +115,6 @@ public class TopRatedFragment extends Fragment {
                 MovieData top_md = topRatedmoviedata.get(position);
 
                 Intent i = new Intent(getActivity(), DetailActivity.class);
-                //i.putExtra(MOVIE_KEY, top_md);
                 i.putExtra(DetailActivity.EXTRA_NAME, top_md);
                 startActivity(i);
 
@@ -148,21 +146,6 @@ public class TopRatedFragment extends Fragment {
                 movieAdapter = new TopRatedMovieAdapter(getActivity(), topRatedmoviedata);
                 mRecyclerView.setAdapter(movieAdapter);
 
-//                movieAdapter.setOnItemClickListener(new PopularMovieAdapter.OnItemClickListener(){
-//
-//                    @Override
-//                    public void onItemClick(View itemView, int position) {
-//                        Toast.makeText(getActivity(), "Top Rated Movie clicked", Toast.LENGTH_SHORT).show();
-//
-//                        MovieData top_md = topRatedmoviedata.get(position);
-//
-//                        Intent i = new Intent(getActivity(), DetailActivity.class);
-//                        //i.putExtra(MOVIE_KEY, top_md);
-//                        i.putExtra(DetailActivity.EXTRA_NAME, top_md);
-//                        startActivity(i);
-//
-//                    }
-//                });
             }
 
             @Override

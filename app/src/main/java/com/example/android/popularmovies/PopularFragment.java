@@ -1,9 +1,11 @@
 package com.example.android.popularmovies;
 
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -67,28 +69,20 @@ public class PopularFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
-        if(popularmoviedata.isEmpty()){
+        if(isOnline() && popularmoviedata.isEmpty()){
             getPopularMovie();
         }
 
     }
 
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        //Toast.makeText(getActivity(), "onActivity created PopularFragment():" + TAG, Toast.LENGTH_SHORT).show();
-    }
+    public boolean isOnline(){
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        //Toast.makeText(getActivity(), "onPause PopularFragment():" + TAG, Toast.LENGTH_SHORT).show();
-    }
+        ConnectivityManager conn_m =
+                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        //Toast.makeText(getActivity(), "onResume PopularFragment():" + TAG, Toast.LENGTH_SHORT).show();
+        NetworkInfo netInfo = conn_m.getActiveNetworkInfo();
+
+        return ((netInfo !=null) && (netInfo.isConnected()));
     }
 
     @Override
@@ -124,7 +118,6 @@ public class PopularFragment extends Fragment {
                 MovieData pop_md = popularmoviedata.get(position);
 
                 Intent i = new Intent(getActivity(), DetailActivity.class);
-                //i.putExtra(MOVIE_KEY, pop_md);
                 i.putExtra(DetailActivity.EXTRA_NAME, pop_md);
                 startActivity(i);
 
@@ -155,22 +148,6 @@ public class PopularFragment extends Fragment {
                 }
                 popmovieAdapter = new PopularMovieAdapter(getActivity(), popularmoviedata);
                 popRecyclerView.setAdapter(popmovieAdapter);
-
-//                popmovieAdapter.setOnItemClickListener(new PopularMovieAdapter.OnItemClickListener(){
-//
-//                    @Override
-//                    public void onItemClick(View itemView, int position) {
-//                        Toast.makeText(getActivity(), "Popular Movie clicked", Toast.LENGTH_SHORT).show();
-//
-//                        MovieData pop_md = popularmoviedata.get(position);
-//
-//                        Intent i = new Intent(getActivity(), DetailActivity.class);
-//                        //i.putExtra(MOVIE_KEY, pop_md);
-//                        i.putExtra(DetailActivity.EXTRA_NAME, pop_md);
-//                        startActivity(i);
-//
-//                    }
-//                });
 
             }
 
