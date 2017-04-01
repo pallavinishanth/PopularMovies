@@ -155,8 +155,6 @@ public class DetailActivity extends AppCompatActivity {
                 markedFav = savedInstanceState.getBoolean("M_marked");
                 movie_id = savedInstanceState.getLong("M_ID");
                 Name = savedInstanceState.getStringArrayList("Name");
-
-                Log.v(LOG_TAG, "savedInstanceState not null Name:" + Name.get(0));
                 Key = savedInstanceState.getStringArrayList("Key");
                 AuthorName = savedInstanceState.getStringArrayList("A_Name");
                 AuthorReview = savedInstanceState.getStringArrayList("A_Review");
