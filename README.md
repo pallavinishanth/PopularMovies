@@ -5,6 +5,8 @@ Popular-Movies
 An Android movie mobile app which displays a grid of movie posters. Developed as part of the Udacity Nanodegree course. The app lets the user to tap on any movie poster from the list of movie posters displayed on the Home Screen in the form of a
 grid.
 
+The main screen is provided with three tabs each shows Popular, Top-Rated and Favorites.
+
 When the user taps on a movie poster on the Main Screen, a View Pager holding the more information such as movie details, trailers and reviews of the movie which the user tapped in the Main Screen will be displayed. 
 
 Users can also mark a movie as their favorite movie by tapping on the "Star" button Details tab of the ViewPager. This will make app to store that particular movie's information locally in the SQLite database to make that particular movie information accessibile even then the app is running offline. Once the movie marked favorite, then the button turns yellow in color to indicate that the movie is marked favorite already.
@@ -13,9 +15,6 @@ In case, if the user wants to remove a particular movie from his/her favorite mo
 
 The app also supports Android Tablet UI. i.e. Users can also use the app on any Android Tablet device running android GINGERBREAD or above versions.
 
-Project Details
-
-The app checks for the chosen sort order and based on that, the app makes an API call when the app is launched. The app fetches movies details from the MovieDB API.
 
 Dependencies used in the project
 
