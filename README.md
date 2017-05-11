@@ -20,13 +20,19 @@ The app checks for the chosen sort order and based on that, the app makes an API
 Dependencies used in the project
 
 Below are the dependencies used in the project : 
+
 com.android.support:appcompat-v7:23.3.0 
+
 com.android.support:design:23.3.0
+
 com.squareup.picasso:picasso:2.5.2
+
 com.squareup.retrofit:converter-gson:2.0.0-beta2
+
 com.squareup.okhttp3:okhttp:3.2.0
+
 com.android.support:support-v4:23.3.0
-com.jakewharton:butterknife:8.0.1'
+
 
 Install
 
