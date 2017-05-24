@@ -2,7 +2,7 @@
 
 An Android movie mobile app which displays a grid of movie posters. Developed as part of the Udacity Nanodegree course. The app lets the user to tap on any movie poster from the list of movie posters displayed on the Home Screen in the form of a grid.
 
-The main screen is provided with three tabs each shows Popular, Top-Rated and Favorites.
+The main screen is provided with three tabs Popular, Top-Rated and Favorites.
 
 When the user taps on a movie poster on the Main Screen, a View Pager holding the more information such as movie details, trailers and reviews of the movie which the user tapped in the Main Screen will be displayed.
 
